@@ -22,11 +22,11 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   Color _statusColor(String status) {
     switch (status) {
       case 'Pending':
-        return Colors.orange;
+        return const Color(0xFFE91E8C); // pink
       case 'In Progress':
-        return Colors.blue;
+        return const Color(0xFF7B1FA2); // medium purple
       case 'Resolved':
-        return Colors.green;
+        return const Color(0xFF4A148C); // deep purple
       default:
         return Colors.grey;
     }

@@ -90,7 +90,7 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen> {
           IconButton(
             icon: Icon(
               _announcement.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-              color: _announcement.isPinned ? Colors.orange : null,
+              color: _announcement.isPinned ? const Color(0xFFE91E8C) : Colors.white,
             ),
             tooltip: _announcement.isPinned ? 'Unpin' : 'Pin',
             onPressed: _togglePin,
@@ -118,7 +118,7 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.blue.shade100,
+                color: const Color(0xFF4A148C).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -143,8 +143,8 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen> {
                 Text(dateFormatted, style: const TextStyle(color: Colors.grey)),
                 if (_announcement.isPinned) ...[
                   const SizedBox(width: 12),
-                  const Icon(Icons.push_pin, size: 14, color: Colors.orange),
-                  const Text(' Pinned', style: TextStyle(color: Colors.orange, fontSize: 13)),
+                  const Icon(Icons.push_pin, size: 14, color: Color(0xFFE91E8C)),
+                  const Text(' Pinned', style: TextStyle(color: Color(0xFFE91E8C), fontSize: 13)),
                 ]
               ],
             ),

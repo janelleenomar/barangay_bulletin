@@ -94,7 +94,7 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
                     final a = announcements[index];
                     return ListTile(
                       leading: a.isPinned
-                          ? const Icon(Icons.push_pin, color: Colors.orange)
+                          ? const Icon(Icons.push_pin, color: Color(0xFFE91E8C))
                           : const Icon(Icons.campaign_outlined),
                       title: Text(a.title),
                       subtitle: Text(
@@ -103,7 +103,7 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
+                          color: const Color(0xFF4A148C).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(a.category,

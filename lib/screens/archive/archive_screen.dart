@@ -185,7 +185,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                               : (object as IssueReport).id),
                           direction: DismissDirection.startToEnd,
                           background: Container(
-                            color: Colors.green,
+                            color: const Color(0xFF4A148C),
                             alignment: Alignment.centerLeft,
                             padding: const EdgeInsets.only(left: 20),
                             child: const Row(
@@ -218,8 +218,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                               children: [
                                 // Restore button
                                 IconButton(
-                                  icon: const Icon(Icons.restore,
-                                      color: Colors.green),
+                                  icon: const Icon(Icons.restore, color: Color(0xFF7B1FA2)),
                                   tooltip: 'Restore',
                                   onPressed: () => _restore(object),
                                 ),
