@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
 import 'models/announcement.dart';
 import 'models/issue_report.dart';
-import 'screens/main_navigation.dart';
+import 'screens/announcements/announcements_list_screen.dart';
+import 'screens/reports/reports_list_screen.dart';
+import 'screens/archive/archive_screen.dart';
 
 void main() async {
-  // 1. Initialize Flutter bindings first (Required since main is async)
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 2. Initialize Hive
   await Hive.initFlutter();
 
-  // 3. Register our generated TypeAdapters
   Hive.registerAdapter(AnnouncementAdapter());
   Hive.registerAdapter(IssueReportAdapter());
 
-  // 4. Open the two required boxes
   await Hive.openBox<Announcement>('announcements');
   await Hive.openBox<IssueReport>('issue_reports');
 
-  // 5. Run the app
   runApp(const BarangayBulletinApp());
 }
 
@@ -33,11 +28,101 @@ class BarangayBulletinApp extends StatelessWidget {
       title: 'Barangay Bulletin',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF4A148C),
+        brightness: Brightness.light,
       ),
-      // The old Scaffold is completely gone, replaced cleanly by MainNavigation
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF4A148C),
+        foregroundColor: Colors.white,
+        elevation: 2,
+        centerTitle: false,
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: Color(0xFFE91E8C),
+        foregroundColor: Colors.white,
+      ),
+      chipTheme: ChipThemeData(
+        selectedColor: const Color(0xFF4A148C).withOpacity(0.2),
+        backgroundColor: Colors.grey.shade100,
+        labelStyle: const TextStyle(fontSize: 13, color: Colors.black87),
+        secondaryLabelStyle: const TextStyle(fontSize: 13, color: Color(0xFF4A148C)),
+        checkmarkColor: const Color(0xFF4A148C),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF4A148C),
+          foregroundColor: Colors.white,
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        border: const OutlineInputBorder(),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Color(0xFF4A148C), width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        selectedItemColor: Color(0xFF4A148C),
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white,
+        elevation: 8,
+    ),
+      useMaterial3: true,
+    ),
       home: const MainNavigation(),
+    );
+  }
+}
+
+class MainNavigation extends StatefulWidget {
+  const MainNavigation({super.key});
+
+  @override
+  State<MainNavigation> createState() => _MainNavigationState();
+}
+
+class _MainNavigationState extends State<MainNavigation> {
+  int _currentIndex = 0;
+
+  final List<String> _titles = ['Announcements', 'Reports', 'Archive'];
+
+  final List<Widget> _screens = [
+    const AnnouncementsListScreen(),
+    const ReportsListScreen(),
+    const ArchiveScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        selectedItemColor: const Color(0xFF4A148C),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.campaign_outlined),
+            activeIcon: Icon(Icons.campaign),
+            label: 'Announcements',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.report_problem_outlined),
+            activeIcon: Icon(Icons.report_problem),
+            label: 'Reports',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.archive_outlined),
+            activeIcon: Icon(Icons.archive),
+            label: 'Archive',
+          ),
+        ],
+      ),
     );
   }
 }
