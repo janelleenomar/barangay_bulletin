@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../models/issue_report.dart';
 import 'report_detail_screen.dart';
 import 'report_form_screen.dart';
@@ -11,44 +12,185 @@ class ReportsListScreen extends StatefulWidget {
 }
 
 class _ReportsListScreenState extends State<ReportsListScreen> {
+  String _selectedStatus = 'All';
+  String _selectedCategory = 'All';
+
+  final List<String> _statuses = ['All', 'Pending', 'In Progress', 'Resolved'];
+  final List<String> _categories = ['All', 'Road', 'Power', 'Water', 'Safety', 'Other'];
+
+  // Status badge colors as required by PRD
+  Color _statusColor(String status) {
+    switch (status) {
+      case 'Pending':
+        return Colors.orange;
+      case 'In Progress':
+        return Colors.blue;
+      case 'Resolved':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  List<IssueReport> _getFilteredReports() {
+    final box = Hive.box<IssueReport>('issue_reports');
+
+    // Load all non-deleted reports once
+    List<IssueReport> all = box.values
+        .where((r) => r.isDeleted == false)
+        .toList();
+
+    // Apply status filter
+    if (_selectedStatus != 'All') {
+      all = all.where((r) => r.status == _selectedStatus).toList();
+    }
+
+    // Chain category filter
+    if (_selectedCategory != 'All') {
+      all = all.where((r) => r.category == _selectedCategory).toList();
+    }
+
+    // Sort by dateReported descending
+    all.sort((a, b) => b.dateReported.compareTo(a.dateReported));
+
+    return all;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Reports')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // Dummy data to test the routing
-            final dummyReport = IssueReport(
-              title: 'Broken Streetlight',
-              description: 'The light on Elm St is flickering.',
-              category: 'Power',
-            );
-            
-            // Route to Detail Screen
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ReportDetailScreen(report: dummyReport),
+      body: Column(
+        children: [
+          // Status filter chips
+          SizedBox(
+            height: 50,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              itemCount: _statuses.length,
+              itemBuilder: (context, index) {
+                final status = _statuses[index];
+                final isSelected = _selectedStatus == status;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: FilterChip(
+                    label: Text(status),
+                    selected: isSelected,
+                    selectedColor: isSelected && status != 'All'
+                        ? _statusColor(status).withOpacity(0.3)
+                        : null,
+                    onSelected: (_) =>
+                        setState(() => _selectedStatus = status),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Category dropdown filter
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: DropdownButtonFormField<String>(
+              value: _selectedCategory,
+              decoration: const InputDecoration(
+                labelText: 'Category',
+                border: OutlineInputBorder(),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
-            );
-          },
-          child: const Text('Test Detail Route'),
-        ),
+              items: _categories
+                  .map((cat) =>
+                      DropdownMenuItem(value: cat, child: Text(cat)))
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() => _selectedCategory = value);
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // List
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable:
+                  Hive.box<IssueReport>('issue_reports').listenable(),
+              builder: (context, box, _) {
+                final reports = _getFilteredReports();
+
+                // Empty state
+                if (reports.isEmpty) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.report_problem_outlined,
+                            size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text('No reports yet.',
+                            style: TextStyle(color: Colors.grey)),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: reports.length,
+                  itemBuilder: (context, index) {
+                    final r = reports[index];
+                    return ListTile(
+                      leading: const Icon(Icons.report_problem_outlined),
+                      title: Text(r.title),
+                      subtitle: Text(
+                        '${r.category} • ${r.dateReported.day}/${r.dateReported.month}/${r.dateReported.year}',
+                      ),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _statusColor(r.status).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          r.status,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _statusColor(r.status),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ReportDetailScreen(report: r),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Route to Form Screen in Create Mode (passing null)
-          final result = await Navigator.push(
+          final result = await Navigator.push<IssueReport>(
             context,
             MaterialPageRoute(
               builder: (context) => const ReportFormScreen(),
             ),
           );
-          
+
           if (result != null) {
-            // We will save to Hive here in the next step!
-            debugPrint('Data returned from form!');
+            final box = Hive.box<IssueReport>('issue_reports');
+            await box.put(result.id, result);
           }
         },
         child: const Icon(Icons.add),
