@@ -12,10 +12,10 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  // We use setState to update this index when a tab is tapped
+  // track current tab index
   int _currentIndex = 0;
 
-  // The list of screens our IndexedStack will hold
+  // define screen tabs
   final List<Widget> _screens = const [
     AnnouncementsListScreen(),
     ReportsListScreen(),
@@ -25,11 +25,8 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // IndexedStack preserves the state of tabs when switching
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      // preserves state across tabs
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -39,17 +36,14 @@ class _MainNavigationState extends State<MainNavigation> {
         },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.campaign), 
+            icon: Icon(Icons.campaign),
             label: 'Announcements',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.report_problem),
             label: 'Reports',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.archive),
-            label: 'Archive',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.archive), label: 'Archive'),
         ],
       ),
     );

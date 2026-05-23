@@ -8,27 +8,34 @@ class AnnouncementsListScreen extends StatefulWidget {
   const AnnouncementsListScreen({super.key});
 
   @override
-  State<AnnouncementsListScreen> createState() => _AnnouncementsListScreenState();
+  State<AnnouncementsListScreen> createState() =>
+      _AnnouncementsListScreenState();
 }
 
 class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
   String _selectedCategory = 'All';
-  final List<String> _categories = ['All', 'Info', 'Event', 'Emergency', 'Health'];
+  final List<String> _categories = [
+    'All',
+    'Info',
+    'Event',
+    'Emergency',
+    'Health',
+  ];
 
   List<Announcement> _getFilteredAnnouncements() {
     final box = Hive.box<Announcement>('announcements');
 
-    // Load all non-deleted announcements once
+    // load all non-deleted announcements
     List<Announcement> all = box.values
         .where((a) => a.isDeleted == false)
         .toList();
 
-    // Apply category filter
+    // apply category filter
     if (_selectedCategory != 'All') {
       all = all.where((a) => a.category == _selectedCategory).toList();
     }
 
-    // Pinned items first, then sort by datePosted descending
+    // sort pinned first then date descending
     all.sort((a, b) {
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
@@ -44,7 +51,7 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
       appBar: AppBar(title: const Text('Announcements')),
       body: Column(
         children: [
-          // Category filter chips
+          // category filter chips
           SizedBox(
             height: 50,
             child: ListView.builder(
@@ -66,23 +73,31 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
             ),
           ),
 
-          // List
+          // announcement list
           Expanded(
             child: ValueListenableBuilder(
-              valueListenable: Hive.box<Announcement>('announcements').listenable(),
+              valueListenable: Hive.box<Announcement>(
+                'announcements',
+              ).listenable(),
               builder: (context, box, _) {
                 final announcements = _getFilteredAnnouncements();
 
-                // Empty state
+                // empty state ui
                 if (announcements.isEmpty) {
                   return const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.campaign_outlined, size: 64, color: Colors.grey),
+                        Icon(
+                          Icons.campaign_outlined,
+                          size: 64,
+                          color: Colors.grey,
+                        ),
                         SizedBox(height: 16),
-                        Text('No announcements yet.',
-                            style: TextStyle(color: Colors.grey)),
+                        Text(
+                          'No announcements yet.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ],
                     ),
                   );
@@ -101,15 +116,21 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
                         '${a.category} • ${a.datePosted.day}/${a.datePosted.month}/${a.datePosted.year}',
                       ),
                       trailing: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4A148C).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(a.category,
-                            style: const TextStyle(fontSize: 12)),
+                        child: Text(
+                          a.category,
+                          style: const TextStyle(fontSize: 12),
+                        ),
                       ),
                       onTap: () {
+                        // nav to detail screen
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -129,6 +150,7 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'announcements_fab',
         onPressed: () async {
+          // add new announcement
           final result = await Navigator.push<Announcement>(
             context,
             MaterialPageRoute(

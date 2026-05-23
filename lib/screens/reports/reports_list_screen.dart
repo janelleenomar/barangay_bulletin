@@ -16,9 +16,16 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   String _selectedCategory = 'All';
 
   final List<String> _statuses = ['All', 'Pending', 'In Progress', 'Resolved'];
-  final List<String> _categories = ['All', 'Road', 'Power', 'Water', 'Safety', 'Other'];
+  final List<String> _categories = [
+    'All',
+    'Road',
+    'Power',
+    'Water',
+    'Safety',
+    'Other',
+  ];
 
-  // Status badge colors as required by PRD
+  // status specific colors
   Color _statusColor(String status) {
     switch (status) {
       case 'Pending':
@@ -35,22 +42,22 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   List<IssueReport> _getFilteredReports() {
     final box = Hive.box<IssueReport>('issue_reports');
 
-    // Load all non-deleted reports once
+    // fetch non-deleted reports
     List<IssueReport> all = box.values
         .where((r) => r.isDeleted == false)
         .toList();
 
-    // Apply status filter
+    // filter by status
     if (_selectedStatus != 'All') {
       all = all.where((r) => r.status == _selectedStatus).toList();
     }
 
-    // Chain category filter
+    // filter by category
     if (_selectedCategory != 'All') {
       all = all.where((r) => r.category == _selectedCategory).toList();
     }
 
-    // Sort by dateReported descending
+    // sort date descending
     all.sort((a, b) => b.dateReported.compareTo(a.dateReported));
 
     return all;
@@ -62,7 +69,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       appBar: AppBar(title: const Text('Reports')),
       body: Column(
         children: [
-          // Status filter chips
+          // status filter chips ui
           SizedBox(
             height: 50,
             child: ListView.builder(
@@ -80,15 +87,14 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                     selectedColor: isSelected && status != 'All'
                         ? _statusColor(status).withOpacity(0.3)
                         : null,
-                    onSelected: (_) =>
-                        setState(() => _selectedStatus = status),
+                    onSelected: (_) => setState(() => _selectedStatus = status),
                   ),
                 );
               },
             ),
           ),
 
-          // Category dropdown filter
+          // category drop down filter ui
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: DropdownButtonFormField<String>(
@@ -96,12 +102,13 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
               decoration: const InputDecoration(
                 labelText: 'Category',
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
               ),
               items: _categories
-                  .map((cat) =>
-                      DropdownMenuItem(value: cat, child: Text(cat)))
+                  .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
                   .toList(),
               onChanged: (value) {
                 if (value != null) {
@@ -112,25 +119,31 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           ),
           const SizedBox(height: 8),
 
-          // List
+          // reports list
           Expanded(
             child: ValueListenableBuilder(
-              valueListenable:
-                  Hive.box<IssueReport>('issue_reports').listenable(),
+              valueListenable: Hive.box<IssueReport>(
+                'issue_reports',
+              ).listenable(),
               builder: (context, box, _) {
                 final reports = _getFilteredReports();
 
-                // Empty state
+                // empty state ui
                 if (reports.isEmpty) {
                   return const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.report_problem_outlined,
-                            size: 64, color: Colors.grey),
+                        Icon(
+                          Icons.report_problem_outlined,
+                          size: 64,
+                          color: Colors.grey,
+                        ),
                         SizedBox(height: 16),
-                        Text('No reports yet.',
-                            style: TextStyle(color: Colors.grey)),
+                        Text(
+                          'No reports yet.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ],
                     ),
                   );
@@ -148,7 +161,9 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                       ),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: _statusColor(r.status).withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
@@ -163,11 +178,11 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                         ),
                       ),
                       onTap: () {
+                        // go to details
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                ReportDetailScreen(report: r),
+                            builder: (context) => ReportDetailScreen(report: r),
                           ),
                         );
                       },
@@ -182,11 +197,10 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'reports_fab',
         onPressed: () async {
+          // add new report
           final result = await Navigator.push<IssueReport>(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ReportFormScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const ReportFormScreen()),
           );
 
           if (result != null) {

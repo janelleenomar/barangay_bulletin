@@ -33,23 +33,25 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
   @override
   void initState() {
     super.initState();
+    // init passed report data
     _report = widget.report;
   }
 
-  // STATUS UPDATE directly from detail screen (PRD requirement)
+  // status update dynamically
   Future<void> _updateStatus(String newStatus) async {
     setState(() => _report.status = newStatus);
     await _report.save();
   }
 
-  // SOFT DELETE
+  // soft delete function
   Future<void> _softDelete() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Report'),
         content: const Text(
-            'This will move the report to the Archive. Continue?'),
+          'This will move the report to the Archive. Continue?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -64,16 +66,17 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
     );
 
     if (confirm == true) {
+      // move to archive
       setState(() {
         _report.isDeleted = true;
         _report.deletedAt = DateTime.now();
       });
       await _report.save();
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context); // close screen on delete
     }
   }
 
-  // EDIT
+  // edit function
   Future<void> _edit() async {
     final result = await Navigator.push<IssueReport>(
       context,
@@ -82,6 +85,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
       ),
     );
 
+    // apply if edit is successful
     if (result != null) {
       setState(() {
         _report.title = result.title;
@@ -95,18 +99,22 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormatted =
-        DateFormat('MMMM d, yyyy').format(_report.dateReported);
+    // format to readable date
+    final dateFormatted = DateFormat(
+      'MMMM d, yyyy',
+    ).format(_report.dateReported);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Report Details'),
         actions: [
+          // edit button action
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: 'Edit',
             onPressed: _edit,
           ),
+          // soft delete button action
           IconButton(
             icon: const Icon(Icons.delete_outline),
             tooltip: 'Delete',
@@ -119,10 +127,9 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Category badge
+            // category badge ui
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 color: const Color(0xFF4A148C).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -130,32 +137,35 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
               child: Text(
                 _report.category,
                 style: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w500),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             const SizedBox(height: 12),
 
-            // Title
+            // title text
             Text(
               _report.title,
-              style: const TextStyle(
-                  fontSize: 22, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
-            // Date
+            // date reported
             Row(
               children: [
-                const Icon(Icons.calendar_today_outlined,
-                    size: 14, color: Colors.grey),
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 14,
+                  color: Colors.grey,
+                ),
                 const SizedBox(width: 4),
-                Text(dateFormatted,
-                    style: const TextStyle(color: Colors.grey)),
+                Text(dateFormatted, style: const TextStyle(color: Colors.grey)),
               ],
             ),
             const Divider(height: 32),
 
-            // Description
+            // description body
             const Text(
               'Description',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
@@ -167,7 +177,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
             ),
             const Divider(height: 32),
 
-            // Status update shortcut (PRD requirement)
+            // status shortcut controls
             const Text(
               'Status',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
@@ -181,7 +191,9 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                   onTap: () => _updateStatus(status),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? _statusColor(status)

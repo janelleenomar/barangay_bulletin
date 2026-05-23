@@ -1,10 +1,13 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
+// generate hive adapter file
 part 'issue_report.g.dart';
 
+// define issue report model for database
 @HiveType(typeId: 1)
 class IssueReport extends HiveObject {
+  // define document fields
   @HiveField(0)
   final String id;
 
@@ -29,6 +32,7 @@ class IssueReport extends HiveObject {
   @HiveField(7)
   DateTime? deletedAt;
 
+  // issue report constructor
   IssueReport({
     String? id,
     required this.title,
@@ -38,6 +42,6 @@ class IssueReport extends HiveObject {
     DateTime? dateReported,
     this.isDeleted = false,
     this.deletedAt,
-  })  : id = id ?? const Uuid().v4(),
-        dateReported = dateReported ?? DateTime.now();
+  }) : id = id ?? const Uuid().v4(), // auto generate id
+       dateReported = dateReported ?? DateTime.now(); // set report date
 }
