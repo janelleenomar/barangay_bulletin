@@ -15,11 +15,11 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   String _selectedFilter = 'All';
   final List<String> _filters = ['All', 'Announcements', 'Reports'];
 
-  // Combines both boxes and returns only soft-deleted entries
+  // combine boxes and return soft-deleted entries
   List<Map<String, dynamic>> _getArchivedItems() {
     final List<Map<String, dynamic>> items = [];
 
-    // Filter type selector logic
+    // filter selector logic
     if (_selectedFilter == 'All' || _selectedFilter == 'Announcements') {
       final announcementBox = Hive.box<Announcement>('announcements');
       final deleted = announcementBox.values
@@ -50,7 +50,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
       }
     }
 
-    // Sort by deletedAt descending
+    // sort by deleted date descending
     items.sort((a, b) {
       final aDate = a['deletedAt'] as DateTime?;
       final bDate = b['deletedAt'] as DateTime?;
@@ -63,7 +63,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
     return items;
   }
 
-  // RESTORE
+  // restore function
   Future<void> _restore(dynamic object) async {
     if (object is Announcement) {
       object.isDeleted = false;
@@ -76,14 +76,15 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
     }
   }
 
-  // HARD DELETE
+  // hard delete function
   Future<void> _hardDelete(dynamic object) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Permanently Delete'),
         content: const Text(
-            'This cannot be undone. The item will be permanently removed.'),
+          'This cannot be undone. The item will be permanently removed.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -91,8 +92,10 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child:
-                const Text('Delete Forever', style: TextStyle(color: Colors.red)),
+            child: const Text(
+              'Delete Forever',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -100,11 +103,11 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
 
     if (confirm == true) {
       if (object is Announcement) {
-        await object.delete(); // HiveObject built-in hard delete
+        await object.delete(); // hive hard delete
       } else if (object is IssueReport) {
         await object.delete();
       }
-      setState(() {}); // Refresh the list
+      setState(() {}); // refresh list
     }
   }
 
@@ -114,13 +117,12 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
       appBar: AppBar(title: const Text('Archive')),
       body: Column(
         children: [
-          // Type filter chips
+          // type filter chips
           SizedBox(
             height: 50,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               itemCount: _filters.length,
               itemBuilder: (context, index) {
                 final filter = _filters[index];
@@ -130,37 +132,43 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                   child: FilterChip(
                     label: Text(filter),
                     selected: isSelected,
-                    onSelected: (_) =>
-                        setState(() => _selectedFilter = filter),
+                    onSelected: (_) => setState(() => _selectedFilter = filter),
                   ),
                 );
               },
             ),
           ),
 
-          // List
+          // archived items list
           Expanded(
             child: ValueListenableBuilder(
-              valueListenable:
-                  Hive.box<Announcement>('announcements').listenable(),
+              valueListenable: Hive.box<Announcement>(
+                'announcements',
+              ).listenable(),
               builder: (context, _, __) {
                 return ValueListenableBuilder(
-                  valueListenable:
-                      Hive.box<IssueReport>('issue_reports').listenable(),
+                  valueListenable: Hive.box<IssueReport>(
+                    'issue_reports',
+                  ).listenable(),
                   builder: (context, _, __) {
                     final items = _getArchivedItems();
 
-                    // Empty state
+                    // empty state ui
                     if (items.isEmpty) {
                       return const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.archive_outlined,
-                                size: 64, color: Colors.grey),
+                            Icon(
+                              Icons.archive_outlined,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
                             SizedBox(height: 16),
-                            Text('Nothing in the archive.',
-                                style: TextStyle(color: Colors.grey)),
+                            Text(
+                              'Nothing in the archive.',
+                              style: TextStyle(color: Colors.grey),
+                            ),
                           ],
                         ),
                       );
@@ -180,9 +188,11 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                             : 'Unknown date';
 
                         return Dismissible(
-                          key: Key(object is Announcement
-                              ? object.id
-                              : (object as IssueReport).id),
+                          key: Key(
+                            object is Announcement
+                                ? object.id
+                                : (object as IssueReport).id,
+                          ),
                           direction: DismissDirection.startToEnd,
                           background: Container(
                             color: const Color(0xFF4A148C),
@@ -192,14 +202,16 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                               children: [
                                 Icon(Icons.restore, color: Colors.white),
                                 SizedBox(width: 8),
-                                Text('Restore',
-                                    style: TextStyle(color: Colors.white)),
+                                Text(
+                                  'Restore',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ],
                             ),
                           ),
                           confirmDismiss: (direction) async {
                             await _restore(object);
-                            return false; // Don't auto-remove, Hive rebuild handles it
+                            return false; // rebuild handles removal
                           },
                           child: ListTile(
                             leading: Icon(
@@ -216,16 +228,21 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Restore button
+                                // restore button action
                                 IconButton(
-                                  icon: const Icon(Icons.restore, color: Color(0xFF7B1FA2)),
+                                  icon: const Icon(
+                                    Icons.restore,
+                                    color: Color(0xFF7B1FA2),
+                                  ),
                                   tooltip: 'Restore',
                                   onPressed: () => _restore(object),
                                 ),
-                                // Hard delete button
+                                // hard delete button action
                                 IconButton(
-                                  icon: const Icon(Icons.delete_forever,
-                                      color: Colors.red),
+                                  icon: const Icon(
+                                    Icons.delete_forever,
+                                    color: Colors.red,
+                                  ),
                                   tooltip: 'Delete Forever',
                                   onPressed: () => _hardDelete(object),
                                 ),

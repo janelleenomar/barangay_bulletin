@@ -9,7 +9,8 @@ class AnnouncementDetailScreen extends StatefulWidget {
   const AnnouncementDetailScreen({super.key, required this.announcement});
 
   @override
-  State<AnnouncementDetailScreen> createState() => _AnnouncementDetailScreenState();
+  State<AnnouncementDetailScreen> createState() =>
+      _AnnouncementDetailScreenState();
 }
 
 class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen> {
@@ -18,22 +19,26 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen> {
   @override
   void initState() {
     super.initState();
+    // init passed announcement data
     _announcement = widget.announcement;
   }
 
-  // PIN / UNPIN
+  // toggle pin status function
   Future<void> _togglePin() async {
     setState(() => _announcement.isPinned = !_announcement.isPinned);
-    await _announcement.save(); // HiveObject's built-in save()
+    await _announcement.save(); // hive built-in save
   }
 
-  // SOFT DELETE
+  // soft delete function
   Future<void> _softDelete() async {
+    // show confirmation dialog
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Announcement'),
-        content: const Text('This will move the announcement to the Archive. Continue?'),
+        content: const Text(
+          'This will move the announcement to the Archive. Continue?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -47,27 +52,31 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen> {
       ),
     );
 
+    // handle user confirmation
     if (confirm == true) {
       setState(() {
         _announcement.isDeleted = true;
         _announcement.deletedAt = DateTime.now();
       });
       await _announcement.save();
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context); // close screen on delete
     }
   }
 
-  // EDIT
+  // edit function
   Future<void> _edit() async {
+    // navigate to form and get result
     final result = await Navigator.push<Announcement>(
       context,
       MaterialPageRoute(
-        builder: (context) => AnnouncementFormScreen(announcement: _announcement),
+        builder: (context) =>
+            AnnouncementFormScreen(announcement: _announcement),
       ),
     );
 
+    // apply if edit is successful
     if (result != null) {
-      // Update fields on the existing Hive object
+      // update fields
       setState(() {
         _announcement.title = result.title;
         _announcement.body = result.body;
@@ -80,28 +89,33 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormatted = DateFormat('MMMM d, yyyy').format(_announcement.datePosted);
+    // format to readable date
+    final dateFormatted = DateFormat(
+      'MMMM d, yyyy',
+    ).format(_announcement.datePosted);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Announcement'),
         actions: [
-          // Pin/Unpin toggle
+          // pin button action
           IconButton(
             icon: Icon(
               _announcement.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-              color: _announcement.isPinned ? const Color(0xFFE91E8C) : Colors.white,
+              color: _announcement.isPinned
+                  ? const Color(0xFFE91E8C)
+                  : Colors.white,
             ),
             tooltip: _announcement.isPinned ? 'Unpin' : 'Pin',
             onPressed: _togglePin,
           ),
-          // Edit
+          // edit button action
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: 'Edit',
             onPressed: _edit,
           ),
-          // Soft delete
+          // soft delete button action
           IconButton(
             icon: const Icon(Icons.delete_outline),
             tooltip: 'Delete',
@@ -114,7 +128,7 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Category badge
+            // category badge UI
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
@@ -123,34 +137,48 @@ class _AnnouncementDetailScreenState extends State<AnnouncementDetailScreen> {
               ),
               child: Text(
                 _announcement.category,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             const SizedBox(height: 12),
 
-            // Title
+            // title text
             Text(
               _announcement.title,
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
-            // Date + pinned status
+            // date and pinned indicator
             Row(
               children: [
-                const Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey),
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 14,
+                  color: Colors.grey,
+                ),
                 const SizedBox(width: 4),
                 Text(dateFormatted, style: const TextStyle(color: Colors.grey)),
                 if (_announcement.isPinned) ...[
                   const SizedBox(width: 12),
-                  const Icon(Icons.push_pin, size: 14, color: Color(0xFFE91E8C)),
-                  const Text(' Pinned', style: TextStyle(color: Color(0xFFE91E8C), fontSize: 13)),
-                ]
+                  const Icon(
+                    Icons.push_pin,
+                    size: 14,
+                    color: Color(0xFFE91E8C),
+                  ),
+                  const Text(
+                    ' Pinned',
+                    style: TextStyle(color: Color(0xFFE91E8C), fontSize: 13),
+                  ),
+                ],
               ],
             ),
             const Divider(height: 32),
 
-            // Body
+            // content body
             Text(
               _announcement.body,
               style: const TextStyle(fontSize: 16, height: 1.6),

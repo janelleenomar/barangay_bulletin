@@ -1,10 +1,13 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
+// generate hive adapter file
 part 'announcement.g.dart';
 
+// define announcement model for database
 @HiveType(typeId: 0)
 class Announcement extends HiveObject {
+  // define document fields
   @HiveField(0)
   final String id;
 
@@ -29,6 +32,7 @@ class Announcement extends HiveObject {
   @HiveField(7)
   DateTime? deletedAt;
 
+  // announcement constructor
   Announcement({
     String? id,
     required this.title,
@@ -38,6 +42,6 @@ class Announcement extends HiveObject {
     this.isPinned = false,
     this.isDeleted = false,
     this.deletedAt,
-  })  : id = id ?? const Uuid().v4(),
-        datePosted = datePosted ?? DateTime.now();
+  }) : id = id ?? const Uuid().v4(), // auto generate id
+       datePosted = datePosted ?? DateTime.now(); // set post date
 }

@@ -19,7 +19,14 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   String? _category;
   String _status = 'Pending';
 
-  final List<String> _categories = ['Road', 'Power', 'Water', 'Safety', 'Other'];
+  // form constants
+  final List<String> _categories = [
+    'Road',
+    'Power',
+    'Water',
+    'Safety',
+    'Other',
+  ];
   final List<String> _statuses = ['Pending', 'In Progress', 'Resolved'];
 
   bool get _isEditMode => widget.report != null;
@@ -27,21 +34,27 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   @override
   void initState() {
     super.initState();
+    // populate if edit mode
     _titleController = TextEditingController(text: widget.report?.title ?? '');
-    _descriptionController = TextEditingController(text: widget.report?.description ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.report?.description ?? '',
+    );
     _category = widget.report?.category;
     _status = widget.report?.status ?? 'Pending';
   }
 
   @override
   void dispose() {
+    // avoid memory leaks
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
 
   void _saveForm() {
+    // validate form fields
     if (_formKey.currentState!.validate()) {
+      // create report object
       final savedReport = IssueReport(
         id: widget.report?.id ?? const Uuid().v4(),
         title: _titleController.text.trim(),
@@ -53,6 +66,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         deletedAt: widget.report?.deletedAt,
       );
 
+      // return to previous screen
       Navigator.pop(context, savedReport);
     }
   }
@@ -60,28 +74,27 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditMode ? 'Edit Report' : 'New Report'),
-      ),
+      appBar: AppBar(title: Text(_isEditMode ? 'Edit Report' : 'New Report')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              // Title
+              // title text field
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
                   labelText: 'Title',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) =>
-                    value == null || value.trim().isEmpty ? 'Title is required' : null,
+                validator: (value) => value == null || value.trim().isEmpty
+                    ? 'Title is required'
+                    : null,
               ),
               const SizedBox(height: 16),
 
-              // Category dropdown
+              // category dropdown
               DropdownButtonFormField<String>(
                 value: _category,
                 decoration: const InputDecoration(
@@ -97,7 +110,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Description
+              // description text field
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
@@ -106,12 +119,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                   alignLabelWithHint: true,
                 ),
                 maxLines: 5,
-                validator: (value) =>
-                    value == null || value.trim().isEmpty ? 'Description is required' : null,
+                validator: (value) => value == null || value.trim().isEmpty
+                    ? 'Description is required'
+                    : null,
               ),
               const SizedBox(height: 16),
 
-              // Status dropdown
+              // status dropdown
               DropdownButtonFormField<String>(
                 value: _status,
                 decoration: const InputDecoration(
@@ -127,7 +141,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Buttons
+              // action buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
