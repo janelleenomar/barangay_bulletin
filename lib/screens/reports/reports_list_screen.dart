@@ -180,6 +180,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'reports_fab',
         onPressed: () async {
           final result = await Navigator.push<IssueReport>(
             context,

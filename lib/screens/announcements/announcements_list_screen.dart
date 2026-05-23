@@ -127,6 +127,7 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'announcements_fab',
         onPressed: () async {
           final result = await Navigator.push<Announcement>(
             context,
