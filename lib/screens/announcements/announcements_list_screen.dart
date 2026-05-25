@@ -96,6 +96,41 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
       appBar: AppBar(title: const Text('Announcements')),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.campaign),
+                        SizedBox(width: 8),
+                        Text(
+                          'Community Board',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Stay updated with the latest barangay announcements.',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           // search bar
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
