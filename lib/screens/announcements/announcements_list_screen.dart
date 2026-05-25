@@ -22,6 +22,8 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
     'Health',
   ];
 
+  String _searchQuery = '';
+
   List<Announcement> _getFilteredAnnouncements() {
     final box = Hive.box<Announcement>('announcements');
 
@@ -33,6 +35,14 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
     // apply category filter
     if (_selectedCategory != 'All') {
       all = all.where((a) => a.category == _selectedCategory).toList();
+    }
+
+    // apply search filter
+    if (_searchQuery.isNotEmpty) {
+      all = all.where((a) {
+        return a.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            a.body.toLowerCase().contains(_searchQuery.toLowerCase());
+      }).toList();
     }
 
     // sort pinned first then date descending
@@ -51,6 +61,27 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
       appBar: AppBar(title: const Text('Announcements')),
       body: Column(
         children: [
+          // search bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search announcements...',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+          ),
+
           // category filter chips
           SizedBox(
             height: 50,
