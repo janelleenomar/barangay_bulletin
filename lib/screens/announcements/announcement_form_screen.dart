@@ -19,7 +19,7 @@ class _AnnouncementFormScreenState extends State<AnnouncementFormScreen> {
   bool _isPinned = false;
 
   // set required categories
-  final List<String> _categories = ['Info', 'Event', 'Emergency', 'Health'];
+  final List<String> _categories = ['Info', 'Event', 'Emergency', 'Health', 'Education', 'Sports', 'Environment', 'Public Service'];
 
   @override
   void initState() {
