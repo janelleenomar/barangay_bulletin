@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/announcement.dart';
 import 'models/issue_report.dart';
-import 'screens/announcements/announcements_list_screen.dart';
-import 'screens/reports/reports_list_screen.dart';
-import 'screens/archive/archive_screen.dart';
+import 'main_navigation.dart';
 
 void main() async {
   // initialize flutter bindings
@@ -80,60 +78,6 @@ class BarangayBulletinApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MainNavigation(),
-    );
-  }
-}
-
-class MainNavigation extends StatefulWidget {
-  const MainNavigation({super.key});
-
-  @override
-  State<MainNavigation> createState() => _MainNavigationState();
-}
-
-class _MainNavigationState extends State<MainNavigation> {
-  // track current tab
-  int _currentIndex = 0;
-
-  final List<String> _titles = ['Announcements', 'Reports', 'Archive'];
-
-  // define screen tabs
-  final List<Widget> _screens = [
-    const AnnouncementsListScreen(),
-    const ReportsListScreen(),
-    const ArchiveScreen(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    // scaffold holds main structure and bottom nav
-    return Scaffold(
-      // indexed stack keeps states alive
-      body: IndexedStack(index: _currentIndex, children: _screens),
-      bottomNavigationBar: BottomNavigationBar(
-        // updates current tab index
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        selectedItemColor: const Color(0xFF4A148C),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.campaign_outlined),
-            activeIcon: Icon(Icons.campaign),
-            label: 'Announcements',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.report_problem_outlined),
-            activeIcon: Icon(Icons.report_problem),
-            label: 'Reports',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.archive_outlined),
-            activeIcon: Icon(Icons.archive),
-            label: 'Archive',
-          ),
-        ],
-      ),
     );
   }
 }
