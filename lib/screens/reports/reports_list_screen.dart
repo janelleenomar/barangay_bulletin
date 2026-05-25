@@ -43,9 +43,17 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     final box = Hive.box<IssueReport>('issue_reports');
 
     // fetch non-deleted reports
-    List<IssueReport> all = box.values
-        .where((r) => r.isDeleted == false)
-        .toList();
+    List<IssueReport> all = [];
+
+    for (final report in box.values) {
+      try {
+        if (report.isDeleted == false) {
+          all.add(report);
+        }
+      } catch (e) {
+        debugPrint('Corrupted report skipped: $e');
+      }
+    }
 
     // filter by status
     if (_selectedStatus != 'All') {

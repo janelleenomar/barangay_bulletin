@@ -29,12 +29,24 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
   String _searchQuery = '';
 
   List<Announcement> _getFilteredAnnouncements() {
+    if (!Hive.isBoxOpen('announcements')) {
+      return [];
+    }
+
     final box = Hive.box<Announcement>('announcements');
 
     // load all non-deleted announcements
-    List<Announcement> all = box.values
-        .where((a) => a.isDeleted == false)
-        .toList();
+    List<Announcement> all = [];
+
+    for (final item in box.values) {
+      try {
+        if (item.isDeleted == false) {
+          all.add(item);
+        }
+      } catch (e) {
+        debugPrint('Corrupted announcement skipped: $e');
+      }
+    }
 
     // apply category filter
     if (_selectedCategory != 'All') {
@@ -102,7 +114,6 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
               elevation: 2,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-              
               ),
               child: const Padding(
                 padding: EdgeInsets.all(16),
@@ -181,6 +192,11 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
                 'announcements',
               ).listenable(),
               builder: (context, box, _) {
+                if (!Hive.isBoxOpen('announcements')) {
+                  return const Center(
+                    child: Text('Announcements storage unavailable.'),
+                  );
+                }
                 final announcements = _getFilteredAnnouncements();
 
                 // empty state ui
