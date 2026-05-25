@@ -214,7 +214,7 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
                           : const Icon(Icons.campaign_outlined),
                       title: Text(a.title),
                       subtitle: Text(
-                        '${a.category} • ${a.datePosted.day}/${a.datePosted.month}/${a.datePosted.year}',
+                        '${a.datePosted.day}/${a.datePosted.month}/${a.datePosted.year}',
                       ),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(
