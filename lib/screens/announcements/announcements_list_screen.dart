@@ -59,6 +59,37 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
     return all;
   }
 
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'Emergency':
+        return Colors.red;
+
+      case 'Event':
+        return Colors.green;
+
+      case 'Info':
+        return Colors.blue;
+
+      case 'Health':
+        return Colors.purple;
+
+      case 'Education':
+        return Colors.indigo;
+
+      case 'Sports':
+        return Colors.orange;
+
+      case 'Environment':
+        return Colors.teal;
+
+      case 'Public Service':
+        return Colors.brown;
+
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,16 +183,22 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
                       ),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: 10,
+                          vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4A148C).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          color: _getCategoryColor(
+                            a.category,
+                          ).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           a.category,
-                          style: const TextStyle(fontSize: 12),
+                          style: TextStyle(
+                            color: _getCategoryColor(a.category),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                       onTap: () {
