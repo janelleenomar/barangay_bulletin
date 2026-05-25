@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'announcements/announcements_list_screen.dart';
-import 'reports/reports_list_screen.dart';
-import 'archive/archive_screen.dart';
+import 'screens/announcements/announcements_list_screen.dart';
+import 'screens/reports/reports_list_screen.dart';
+import 'screens/archive/archive_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
