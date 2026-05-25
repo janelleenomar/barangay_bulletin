@@ -7,21 +7,33 @@ import 'screens/reports/reports_list_screen.dart';
 import 'screens/archive/archive_screen.dart';
 
 void main() async {
-  // initialize flutter bindings
   WidgetsFlutterBinding.ensureInitialized();
-  // init local database
-  await Hive.initFlutter();
 
-  // register models
-  Hive.registerAdapter(AnnouncementAdapter());
-  Hive.registerAdapter(IssueReportAdapter());
+  try {
+    await Hive.initFlutter();
 
-  // open storage for data
-  await Hive.openBox<Announcement>('announcements');
-  await Hive.openBox<IssueReport>('issue_reports');
+    Hive.registerAdapter(AnnouncementAdapter());
+    Hive.registerAdapter(IssueReportAdapter());
 
-  // run main app widget
-  runApp(const BarangayBulletinApp());
+    await Hive.openBox<Announcement>('announcements');
+    await Hive.openBox<IssueReport>('issue_reports');
+
+    runApp(const BarangayBulletinApp());
+
+  } catch (e) {
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text(
+              'Failed to initialize local storage.\n$e',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class BarangayBulletinApp extends StatelessWidget {
