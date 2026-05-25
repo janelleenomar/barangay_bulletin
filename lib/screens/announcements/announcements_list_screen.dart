@@ -20,6 +20,10 @@ class _AnnouncementsListScreenState extends State<AnnouncementsListScreen> {
     'Event',
     'Emergency',
     'Health',
+    'Education',
+    'Sports',
+    'Environment',
+    'Public Service',
   ];
 
   String _searchQuery = '';
